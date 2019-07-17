@@ -9,22 +9,63 @@ var uuidv4 = require('uuid/v4');
 var languagePair = new configstore('language-config-pair');
 var history = new configstore("translate-history");
 
-var data = {
-  read: process.env.read || 'remote',
-  save: process.env.save_count || 20,
-  domain: process.env.domain || 'https://translate.google.com',
-  input: alfy.input,
-  from: {
-    lang: languagePair.get('source') || 'en',
-    ttsfile: os.tmpdir() + '/' + uuidv4() + ".mp3",
-    text: []
-  },
-  to: {
-    lang: languagePair.get('target') || 'en',
-    ttsfile: os.tmpdir() + '/' + uuidv4() + ".mp3",
-    text: []
-  }
-};
+const CNREG = /^[\u4e00-\u9fa5]/;
+const ENREG = /^[a-zA-Z\/ ]/;
+
+if (CNREG.test(alfy.input)) {
+  // console.log('中译英')
+  var data = {
+    read: process.env.read || 'remote',
+    save: process.env.save_count || 20,
+    domain: process.env.domain || 'https://translate.google.cn',
+    input: alfy.input,
+    from: {
+      lang:  'zh-CN',
+      ttsfile: os.tmpdir() + '/' + uuidv4() + ".mp3",
+      text: []
+    },
+    to: {
+      lang:  'en',
+      ttsfile: os.tmpdir() + '/' + uuidv4() + ".mp3",
+      text: []
+    }
+  };
+} else if (ENREG.test(alfy.input)) {
+  // console.log('英译中')
+  var data = {
+    read: process.env.read || 'remote',
+    save: process.env.save_count || 20,
+    domain: process.env.domain || 'https://translate.google.cn',
+    input: alfy.input,
+    from: {
+      lang: 'en',
+      ttsfile: os.tmpdir() + '/' + uuidv4() + ".mp3",
+      text: []
+    },
+    to: {
+      lang: 'zh-CN',
+      ttsfile: os.tmpdir() + '/' + uuidv4() + ".mp3",
+      text: []
+    }
+  };
+}
+
+// var data = {
+//   read: process.env.read || 'remote',
+//   save: process.env.save_count || 20,
+//   domain: process.env.domain || 'https://translate.google.cn',
+//   input: alfy.input,
+//   from: {
+//     lang: languagePair.get('source') || 'en',
+//     ttsfile: os.tmpdir() + '/' + uuidv4() + ".mp3",
+//     text: []
+//   },
+//   to: {
+//     lang: languagePair.get('target') || 'en',
+//     ttsfile: os.tmpdir() + '/' + uuidv4() + ".mp3",
+//     text: []
+//   }
+// };
 
 //文档上说cmd+L时会找largetype，找不到会找arg，但是实际并不生效。
 //同时下一步的发音模块中query变量的值为arg的值。
